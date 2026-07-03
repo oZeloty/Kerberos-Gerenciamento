@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from .models import Usuario, Pet
 
-# Create your views here.
+
+def listar_usuarios(request):
+    usuarios = Usuario.objects.all()
+    contexto = {'usuarios': usuarios}
+    return render(request, 'usuario/listar_usuarios.html', contexto)
