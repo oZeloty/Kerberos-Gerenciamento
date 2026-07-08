@@ -71,10 +71,15 @@ WSGI_APPLICATION = "FamaPet.wsgi.application"
 
 # Database
 DATABASES = {
-    "default": env.db(
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    },
+
+    "postgres": env.db(
         "DATABASE_URL",
         default="postgres://usuario:senha@localhost:5432/nome_do_banco"
-    )
+    ),
 }
 
 
