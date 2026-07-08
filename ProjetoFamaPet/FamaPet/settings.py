@@ -1,18 +1,27 @@
+import environ
 from pathlib import Path
-import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
+# Initialize environment variables
+env = environ.Env(
+    # set casting and default values
+    DEBUG=(bool, False)
+)
 
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+# Take environment variables from .env file
+environ.Env.read_env(BASE_DIR / '.env')
+
+TEMPLATES_DIR = BASE_DIR / 'templates'
+
+# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-jrwlc81sgsdj)a2(307un4&$y28gl6p)1va#5z0j^95n4i$%hl"
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -26,7 +35,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "kerberos",
 ]
 
@@ -44,6 +52,7 @@ ROOT_URLCONF = "FamaPet.urls"
 
 TEMPLATES = [
     {
+        # CORREÇÃO: Ajustado para o motor de templates correto do Django
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [TEMPLATES_DIR],
         "APP_DIRS": True,
@@ -61,19 +70,15 @@ WSGI_APPLICATION = "FamaPet.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    "default": env.db(
+        "DATABASE_URL",
+        default="postgres://usuario:senha@localhost:5432/nome_do_banco"
+    )
 }
 
 
 # Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -91,31 +96,21 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
-
 LANGUAGE_CODE = 'pt-br'
-
 TIME_ZONE = 'America/Sao_Paulo'
-
 USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
+USE_TZ = True # Note: USE_L10N removed for Django 5.0+ compatibility
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
-STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
-
 STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    BASE_DIR / 'static',
 ]
 
-MEDIA_ROOT=os.path.join(BASE_DIR,'media')
 MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 CSRF_TRUSTED_ORIGINS = [
     "https://localhost:8000",
